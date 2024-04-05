@@ -2,11 +2,10 @@ from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
-from sqlalchemy.ext.asyncio import AsyncAttrs
 
 from database import Base
 
-class User(SQLAlchemyBaseUserTable[int], Base, AsyncAttrs):
+class User(SQLAlchemyBaseUserTable[int], Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)
     username = Column(String, nullable=False)
