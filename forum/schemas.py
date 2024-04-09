@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -21,6 +22,9 @@ class CommentRead(CommentCreate):
     post_id: int
     text: str
     created_at: datetime
+
+class OnePostRead(PostRead):
+    comments: List[CommentRead]
 
 
 
