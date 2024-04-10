@@ -1,6 +1,7 @@
 from typing import List, Union
 
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -16,6 +17,7 @@ router = APIRouter(
     tags=["Forum"]
 )
 
+
 @router.post("/post")
 async def add_post(new_post: PostCreate,
                    user: User = Depends(current_user),
@@ -25,12 +27,14 @@ async def add_post(new_post: PostCreate,
     await session.commit()
     return {"status": "post was created"}
 
+
 @router.get("/my_posts", response_model=List[PostRead])
 async def get_my_posts(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     query = select(Post).where(Post.user_id == user.id)
     result = await session.execute(query)
     return result.scalars().all()
+
 
 @router.get("/post/{post_id}")
 async def get_post(post_id: int,
@@ -43,11 +47,14 @@ async def get_post(post_id: int,
     else:
         return f"There is no post with id {post_id}"
 
+
 @router.get("/all_posts", response_model=List[PostRead])
+@cache(expire=30)
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
     query = select(Post)
     result = await session.execute(query)
     return result.scalars().all()
+
 
 @router.delete("/post/{post_id}")
 async def delete_post(post_id: int,
@@ -65,6 +72,7 @@ async def delete_post(post_id: int,
     else:
         return f"You don't have post with id {post_id}"
 
+
 @router.patch("/post/{post_id}")
 async def patch_post(post_id: int,
                      update_post: PostUpdate,
@@ -80,6 +88,7 @@ async def patch_post(post_id: int,
     else:
         return f"You don't have post with id {post_id}"
 
+
 @router.post("/add_comment")
 async def add_comment(new_comment: CommentCreate,
                    user: User = Depends(current_user),
@@ -88,6 +97,7 @@ async def add_comment(new_comment: CommentCreate,
     await session.execute(comment)
     await session.commit()
     return {"status": "comment was created"}
+
 
 @router.delete("/comment_id/{comment_id}")
 async def delete_comment(comment_id: int,
@@ -102,6 +112,7 @@ async def delete_comment(comment_id: int,
         return {"status": "comment was deleted"}
     else:
         return f"You don't have comment with id {comment_id}"
+
 
 @router.patch("/comment/{comment_id}")
 async def patch_comment(comment_id: int,
