@@ -7,6 +7,7 @@ from redis import asyncio as aioredis
 
 from auth.base_config import auth_backend, fastapi_users
 from auth.schemas import UserRead, UserCreate
+from config import REDIS_HOST, REDIS_PORT
 from database import create_tables
 from forum.router import router as router_forum
 
@@ -14,7 +15,7 @@ from forum.router import router as router_forum
 @asynccontextmanager
 async def lifespan(app: FastAPI):
    await create_tables()
-   redis = aioredis.from_url("redis://localhost")
+   redis = aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}")
    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
    yield
    await redis.close()
@@ -39,9 +40,3 @@ app.include_router(
 app.include_router(
     router_forum
 )
-
-
-# @app.on_event("startup")
-# async def startup():
-#     redis = aioredis.from_url("redis://localhost")
-#     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")

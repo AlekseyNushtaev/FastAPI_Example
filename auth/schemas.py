@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi_users import schemas
+from pydantic import ConfigDict
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -11,8 +12,7 @@ class UserRead(schemas.BaseUser[int]):
     is_superuser: bool = False
     is_verified: bool = False
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(schemas.BaseUserCreate):
